@@ -1,2 +1,2 @@
-# blog
+# Blog
 This is a blog
