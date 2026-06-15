@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Luca Y. Kogelheide">
+
+<title>Tutorial: Marginal Structural Models for Panel Conditioning Research – Luca Kogelheide</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-158031087360bce0ff56dc785ce39e06.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-marginal-structural-models" id="toc-why-marginal-structural-models" class="nav-link active" data-scroll-target="#why-marginal-structural-models">Why Marginal Structural Models?</a>
+  <ul class="collapse">
+  <li><a href="#treatment-induced-time-varying-confounding-in-panel-conditioning-research" id="toc-treatment-induced-time-varying-confounding-in-panel-conditioning-research" class="nav-link" data-scroll-target="#treatment-induced-time-varying-confounding-in-panel-conditioning-research">Treatment-Induced Time-Varying Confounding in Panel Conditioning Research</a></li>
+  </ul></li>
+  <li><a href="#introducing-marginal-structural-models" id="toc-introducing-marginal-structural-models" class="nav-link" data-scroll-target="#introducing-marginal-structural-models">Introducing Marginal Structural Models</a>
+  <ul class="collapse">
+  <li><a href="#representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs" id="toc-representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs" class="nav-link" data-scroll-target="#representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs">Representing Treatment-Induced Time-Varying Confounding Using Directed Acyclic Graphs</a></li>
+  </ul></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation:</a>
+  <ul class="collapse">
+  <li><a href="#the-data-generating-process" id="toc-the-data-generating-process" class="nav-link" data-scroll-target="#the-data-generating-process">The Data-Generating Process</a>
+  <ul class="collapse">
+  <li><a href="#unobserved-heterogeneity" id="toc-unobserved-heterogeneity" class="nav-link" data-scroll-target="#unobserved-heterogeneity">Unobserved Heterogeneity</a></li>
+  <li><a href="#time-varying-confounder" id="toc-time-varying-confounder" class="nav-link" data-scroll-target="#time-varying-confounder">Time-Varying Confounder</a></li>
+  <li><a href="#treatment-assignment" id="toc-treatment-assignment" class="nav-link" data-scroll-target="#treatment-assignment">Treatment Assignment</a></li>
+  <li><a href="#outcome-variable" id="toc-outcome-variable" class="nav-link" data-scroll-target="#outcome-variable">Outcome Variable</a></li>
+  </ul></li>
+  <li><a href="#model-and-identification-strategies" id="toc-model-and-identification-strategies" class="nav-link" data-scroll-target="#model-and-identification-strategies">Model and Identification Strategies</a>
+  <ul class="collapse">
+  <li><a href="#estimands" id="toc-estimands" class="nav-link" data-scroll-target="#estimands">Estimands</a></li>
+  <li><a href="#benchmark-regressions" id="toc-benchmark-regressions" class="nav-link" data-scroll-target="#benchmark-regressions">Benchmark Regressions</a></li>
+  <li><a href="#inverser-probability-of-treamtent-weights" id="toc-inverser-probability-of-treamtent-weights" class="nav-link" data-scroll-target="#inverser-probability-of-treamtent-weights">Inverser-Probability-of-Treamtent Weights</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#absolute-bias" id="toc-absolute-bias" class="nav-link" data-scroll-target="#absolute-bias">Absolute Bias</a></li>
+  <li><a href="#root-mean-squared-error" id="toc-root-mean-squared-error" class="nav-link" data-scroll-target="#root-mean-squared-error">Root Mean Squared Error</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="MSMPanelCond.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tutorial: Marginal Structural Models for Panel Conditioning Research</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliations</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Luca Y. Kogelheide <a href="mailto:luca.kogelheide@iab.de" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0009-0000-6724-0779" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Institute of Employment Research
+          </p>
+        <p class="affiliation">
+            University of Mannheim
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">15.06.2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This simulation is based on a paper by <span class="citation" data-cites="blackwell2018make">Blackwell &amp; Glynn (<a href="#ref-blackwell2018make" role="doc-biblioref">2018</a>)</span>. You can find the Dataverse and replication files <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/SFBX6Z">here</a>.</p>
+<section id="why-marginal-structural-models" class="level1">
+<h1>Why Marginal Structural Models?</h1>
+<p>Let’s assume we are interested in the longitudinal effect of a particular treatment <span class="math inline">\(A(t)\)</span>. This treatment could be the intake of a specific medicine, taking part in a training programme, or participating in some sort of event – like participating in a survey. In addition to treatment <span class="math inline">\(t\)</span>, we also measure other predictors stored in the vector <span class="math inline">\(L(z)\)</span>. Let <span class="math inline">\(\bar A(t)\)</span> be the treatment history and <span class="math inline">\(\bar L(z)\)</span> the history of predictors.</p>
+<p>According, to <span class="citation" data-cites="robins1999association">Robins (<a href="#ref-robins1999association" role="doc-biblioref">1999</a>)</span>, say that a treatment process is <em>causally exogenous</em> when the conditional probability of receiving treatment at time-point <span class="math inline">\(k\)</span> given past treatment and prognostic factors (predictors) only depends on past treatment history, i.e.&nbsp;<span class="math inline">\(\Pr(A(t_k) \mid \bar A(t); \bar L(z)) = \Pr(A(t_k) \mid \bar A(t))\)</span>. Translating this to <em>statistical exogeneity</em> means that the probability of receiving treatment at time-point <span class="math inline">\(k\)</span> does not depend on the history of measured time-dependent predictors <span class="math inline">\(\bar L(z)\)</span> up to <span class="math inline">\(k\)</span>, conditional on treatment history prior to <span class="math inline">\(k\)</span>:</p>
+<p><span class="math display">\[
+A(t_k) \perp \!\!\! \perp \bar L(t_k) \mid \bar A(t_{k-1}).
+\]</span> In this case we can run a simple regression to identify the causal effect of treatment on the outcome: <span class="math inline">\(\mathbb{E}[Y \mid \bar A] = \beta_0 + \beta_1 \text{cum}(A)\)</span>, where <span class="math inline">\(\text{cum}(A)\)</span> is the individual cumulative treatment.</p>
+<p>However, this is quite a strong assumption, and often times the treatment does depend on (measured) covariates that also predict the outcome, a process known as time-varying confounding. We talk about <em>time-varying confounding</em> if a time-varying predictor <span class="math inline">\(z_k\)</span> is a predictor of the outcome of interest <span class="math inline">\(Y_k\)</span> and also predicts subsequent treatment exposure <span class="math inline">\(A(t_{k+1})\)</span>. Furthermore, when treatment is not only influenced by previous levels of the covariates, but also causally affects future levels of the covariates, <span class="math inline">\(L(z)\)</span> is a time-varying confounder affected by prior treatment. We call this <em>treatment-induced time-varying confounding</em>, or treatment-confounder feedback <span class="citation" data-cites="robins2000marginal">(<a href="#ref-robins2000marginal" role="doc-biblioref">Robins et al., 2000</a>)</span>. Including covariates which are influenced by prior treatment into the model blocks part of the causal effect of <span class="math inline">\(A(t)\)</span> on <span class="math inline">\(Y\)</span>, introducing post-treatment bias into the regression estimates. Now, the relevant predictors are not only confounders, which we usually want to control for in our model, but also affected by prior treatment, which introduces post treatment bias if included in the model. Marginal Structural Models (MSMs) solve this by using inverse-probability-of-treatment weighting to create a pseudo-population where treatment is no longer associated with those confounders.</p>
+<section id="treatment-induced-time-varying-confounding-in-panel-conditioning-research" class="level2">
+<h2 class="anchored" data-anchor-id="treatment-induced-time-varying-confounding-in-panel-conditioning-research">Treatment-Induced Time-Varying Confounding in Panel Conditioning Research</h2>
+<p>Relating this to the study of panel conditioning, we have survey participation as treatment, and misreporting behaviour in future survey waves as the outcome of interest. The causal exogeneity condition would be: The probability of participating in the survey at wave <span class="math inline">\(k\)</span>, given past participation and respondent characteristics, depends only on past participation history, not on respondent’s characteristics. This is obviously unrealistic, as we would assume that some respondent’s characteristics are related to both misreporting and survey participation: subjective response burden, susceptibility to social desirability, survey experience, or trust in the survey/institution. Similarly, it is reasonable to assume that at least some of these characteristics are also influenced by survey participation, making them treatment-induced time-varying confounders.</p>
+</section>
+</section>
+<section id="introducing-marginal-structural-models" class="level1">
+<h1>Introducing Marginal Structural Models</h1>
+<p>Building on the <em>Potential Outcomes Framework</em>, we define <span class="math inline">\(Y_{\bar a}\)</span> to be the (possibly counterfactual) random variable representing a subject’s outcome had the subject been treated with treatment history <span class="math inline">\(\bar a = \{a(t); 0 \leq t \leq K+1 \}\)</span>, instead of his/her observed history <span class="math inline">\(\bar A\)</span>. We define <span class="math inline">\(\mathbb{E}[Y_{\bar a}] = \beta_0 + \beta_1 \text{cum}(\bar a)\)</span> as our marginal structural model — a model for the marginal distribution of each counterfactual outcome <span class="citation" data-cites="robins1999association">(<a href="#ref-robins1999association" role="doc-biblioref">Robins, 1999</a>)</span>. Let’s say our outcome variable is binary. We want to model the marginal outcome probability as</p>
+<p><span class="math display">\[\Pr(Y_{\bar a} = 1) = \beta_0 + \beta_1 \text{cum}(\bar a).\]</span></p>
+<p>However, using observed data we can only model</p>
+<p><span class="math display">\[\Pr(Y = 1 \mid \bar A = \bar a) = \gamma_0 + \gamma_1 \text{cum}(\bar a),\]</span></p>
+<p>as we only observe treatment history <span class="math inline">\(\bar A\)</span>. <span class="math inline">\(\beta_1 = \gamma_1\)</span> is only true when complete causal exogeneity holds. Otherwise, we can use a weighted regression approach to obtain an unbiased estimate of <span class="math inline">\(\beta_1\)</span>. Assuming we have measured all relevant predictors <span class="math inline">\(L(z)\)</span>, we can create a pseudo-population in which, after weighting, the confounders are equally distributed across the treated and the untreated groups <span class="citation" data-cites="chesnaye2022introduction">(<a href="#ref-chesnaye2022introduction" role="doc-biblioref">Chesnaye et al., 2022</a>)</span> and thus can be interpreted as if it arose from a sequentially randomized trial. The inverse-probability-of-treatment weight (IPTW) models each subjects’ probability of having his/her own observed treatment history (propensity score) and taking the inverse of this probability:</p>
+<p><span class="math display">\[w_i = \left[\prod_{k=0}^K \Pr(A_k = a_{ki} \mid \bar A_{k-1} = \bar a_{k-1, i}, \bar L_k)\right]^{-1}.\]</span> To reduce its variance, we can further stabilize these IPTWs by including their baseline probability in the numerator of the weighting model:</p>
+<p><span class="math display">\[sw_i = \prod_{k=0}^K\frac{\Pr(A_k = a_{ki} \mid \bar A_{k-1} = \bar a_{k-1, i}} {\Pr(A_k = a_{ki} \mid \bar A_{k-1} = \bar a_{k-1, i}, \bar L_k)}.\]</span> The numerator conditions only on past treatment, producing a pseudo-population in which participation at wave <span class="math inline">\(k\)</span> is independent of the time-varying confounders given past participation history <span class="citation" data-cites="robins1999association">(<a href="#ref-robins1999association" role="doc-biblioref">Robins, 1999</a>)</span>. The denominator model additionally conditions on the confounders, removing the dependence from the observed data.<br>
+Furthermore, it is good practice to truncate the weights (usually at the 1st and 99th percentile or at the 5th and 95th percentile) to remove larger outliers and thus reduce the weights variance <span class="citation" data-cites="cole2008constructing">(<a href="#ref-cole2008constructing" role="doc-biblioref">Cole &amp; Hernán, 2008</a>)</span>.</p>
+<section id="representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs" class="level2">
+<h2 class="anchored" data-anchor-id="representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs">Representing Treatment-Induced Time-Varying Confounding Using Directed Acyclic Graphs</h2>
+<p>We can represent such a data-generating process (DGP) in which we have treatment-induced time-varying confounding as follows. To repeat: We talk about time-varying confounding, if</p>
+<ul>
+<li>a time-varying predictor <span class="math inline">\(z_k\)</span> is a predictor of the outcome of interest <span class="math inline">\(Y_k\)</span>, and<br>
+</li>
+<li>a time-varying predictor <span class="math inline">\(z_k\)</span> is a predictor of subsequent treatment exposure <span class="math inline">\(A(t_{k+1}).\)</span></li>
+</ul>
+<p>We can visualize this using directed acyclic graphs (DAGs). To make it easier to interpret, we restrict the DAG to two time-points: <span class="math inline">\(k-1\)</span> and <span class="math inline">\(k\)</span>. This can easily be extended to any number of time-points.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this DAG, we see that the confounders are a causal predictor of treatment, and treatment is a causal predictor of the outcome variable of interest. Furthermore, the outcome variable at the previous time-point is a direct cause of the treatment variable at the next time-point. Note that the confounder variable does not have a direct causal relationship with our outcome variable. However, because both have a common cause, namely unobserved heterogeneity, they are correlated due to an indirect relationship and the confounder is a meaningful predictor of the outcome variable. In the simulation, I will also include a scenario in which there is such a direct causal relationship.</p>
+<p>Additionally, we talk about treatment-induced time-varying confounding, if</p>
+<ul>
+<li>we have time-varying confounding, and<br>
+</li>
+<li>treatment <span class="math inline">\(A(t_k)\)</span> causally affects subsequent levels of the covariates <span class="math inline">\(z_{k+1}\)</span> (see the arrow from “Treatment (t-1)” to “Confounder (t)”).</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Lastly, we can also include a direct causal effect from the confounder (in our case respondents characteristics) to our outcome variable of interest.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="simulation" class="level1">
+<h1>Simulation:</h1>
+<section id="the-data-generating-process" class="level2">
+<h2 class="anchored" data-anchor-id="the-data-generating-process">The Data-Generating Process</h2>
+<p>To build intuition for what MSMs do and when they are needed, we build upon and extend the simulated panel dataset of <a href="https://www.cambridge.org/core/journals/american-political-science-review/article/abs/how-to-make-causal-inferences-with-timeseries-crosssectional-data-under-selection-on-observables/498BE04E5AF9802EC4D33DD7A4016584"><span class="citation" data-cites="blackwell2018make">Blackwell &amp; Glynn (<span>2018</span>)</span></a> in which we know the true causal structure by construction. We generate data for <span class="math inline">\(100\)</span> and <span class="math inline">\(1500\)</span> respondents observed over <span class="math inline">\(5\)</span> time periods (survey waves). At each wave, three variables are recorded, a time-varying confounder <span class="math inline">\(z_{ik}\)</span>, a binary treatment indicator <span class="math inline">\(x_{ik}\)</span>, and a continuous outcome <span class="math inline">\(y_{ik}\)</span> serving as a latent measure of misreporting propensity. The simulation also tracks four potential outcomes: <span class="math inline">\(y_{ik}^{11}, y_{ik}^{10}, y_{ik}^{01}, y_{ik}^{00}\)</span>, where the superscripts denote whether the respondents participated in the previous wave and the current wave, respectively.</p>
+<section id="unobserved-heterogeneity" class="level3">
+<h3 class="anchored" data-anchor-id="unobserved-heterogeneity">Unobserved Heterogeneity</h3>
+<p>To capture stable between-person differences, each respondent is assigned a time-stable unobserved characteristic <span class="math inline">\(u_i \sim \mathcal{N}(0, \sigma),\)</span> with <span class="math inline">\(\sigma\)</span> = 0.1. Unobserved heterogeneity influences both participation decisions and reporting behaviour throughout the panel. Because <span class="math inline">\(u_i\)</span> is never observed, it acts as a latent common cause of treatment and outcome at every wave, opening backdoor paths that cannot be closed by conditioning on measured covariates alone. Thus, it is to be expected that we find some bias in our models later on.</p>
+</section>
+<section id="time-varying-confounder" class="level3">
+<h3 class="anchored" data-anchor-id="time-varying-confounder">Time-Varying Confounder</h3>
+<p>We initialize the confounder as <span class="math display">\[ z_{i1} = 1.7u_i + \varepsilon_{i1}^z, \quad \varepsilon_{i1}^z \sim \mathcal{N}(-0.4, \sigma). \]</span> At all subsequent waves, the confounder evolves according to treatment status at the previous wave: <span class="math display">\[ z_{ik} = \gamma_1 + \gamma_2x_{i, k-1} + 1.7u_i + \varepsilon_{i1}^z, \quad \varepsilon_{i1}^z \sim \mathcal{N}(0, \sigma), \]</span> with <span class="math inline">\(\gamma_1\)</span> = 0.5 and <span class="math inline">\(\gamma_2\)</span> = 0 in the scenario <em>without</em> treatment-induced confounding and <span class="math inline">\(\gamma_2\)</span> = -0.5 in the scenario <em>with</em> treatment-induced confounding. Standard covariate adjustment breaks down here, because conditioning on <span class="math inline">\(z_{ik}\)</span> to remove confounding simultaneously blocks part of the causal effect that runs through the treatment-confounder-outcome chain, making MSMs necessary. In our case, participating at wave <span class="math inline">\(k-1\)</span> changes the respondents state which then predicts both their probability of participating again and how they report in the future.</p>
+</section>
+<section id="treatment-assignment" class="level3">
+<h3 class="anchored" data-anchor-id="treatment-assignment">Treatment Assignment</h3>
+<p>At the first wave, treatment is binary and follows a logistic model: <span class="math display">\[\Pr(x_{i1} = 1) = \text{logit}^{-1}(\alpha_0 + \alpha_1z_{i1}),\]</span> with intercept <span class="math inline">\(\alpha_0\)</span> = -2.5 and coefficient <span class="math inline">\(\alpha_1\)</span> = 1.5. From wave 2 onward, participation is modelled as a latent-variable probit: <span class="math display">\[ x_{ik} = 1[\alpha_0 + \alpha_1z_{ik} + \alpha_2y_{i, k-1} + \nu_{ik} &gt; 0] \quad \nu_{ik} \sim \mathcal{N}(0,1), \]</span> with <span class="math inline">\(\alpha_0\)</span> = -2.5, <span class="math inline">\(\alpha_1\)</span> = 1.5, and <span class="math inline">\(\alpha_2\)</span> = -1. Next to the current confounder <span class="math inline">\(z_{ik}\)</span>, we see that <em>lagged outcome</em> <span class="math inline">\(y_{i, k-1}\)</span> predicts the participation propensity. This creates a causal relationship from past outcome to future treatment in the DAG and is the pathway through which non-ignorable attrition operates in this simulation.</p>
+</section>
+<section id="outcome-variable" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-variable">Outcome Variable</h3>
+<p>The outcome at wave 1 is drawn from a baseline level that depends on unobserved heterogeneity, the confounder, and whether the respondent was treated: <span class="math display">\[ y_{i1} = 0.8 + 0.9u_i + \eta z_{i1} + \mu x_{i1} + \varepsilon_{i1}^y, \]</span> where <span class="math inline">\(\eta\)</span> = 0 in the scenario where the confounder has no direct effect on the outcome, <span class="math inline">\(\eta\)</span> = 0.3 when the confounder has a direct effect, and <span class="math inline">\(\mu\)</span> = -0.15 is the contemporaneous effect of being treated for the first time. From wave 2 onward, the outcome is defined through a potential-outcomes decomposition: <span class="math display">\[
+y_{ik} = y_{ik}^{00} + x_{i,k-1}\underbrace{(y_{ik}^{10}-y_{ik}^{00})}_{\text{lagged effect}} +
+x_{ik}\underbrace{(y_{ik}^{01}-y_{ik}^{00})}_{\text{contemp. effect}} +
+x_{i,k-1}x_{ik}\underbrace{[(y_{ik}^{11}-y_{ik}^{01})-(y_{ik}^{10}-y_{ik}^{00})]}_{\text{interaction}}.
+\]</span> The four potential outcomes are constructed additively from the baseline, the lagged effect <span class="math inline">\(\mu_0\)</span> = 0.1, the contemporaneous effect <span class="math inline">\(\mu_1\)</span> = -0.25 (participated in both current and previous wave) and <span class="math inline">\(\mu_2\)</span> = -0.15 (participated in current wave only), all relative to the untreated baseline <span class="math inline">\(y_{ik}^{00}.\)</span></p>
+</section>
+</section>
+<section id="model-and-identification-strategies" class="level2">
+<h2 class="anchored" data-anchor-id="model-and-identification-strategies">Model and Identification Strategies</h2>
+<p>Using this DGP I want to compare how different models recover the true causal effects. For each simulated dataset, we estimate 12 models, ranging from naive regression to several variants of MSM estimators, and evaluate each by its bias relative to the known true value and its RMSE (root mean squared error).</p>
+<section id="estimands" class="level3">
+<h3 class="anchored" data-anchor-id="estimands">Estimands</h3>
+<p>We target two distinct causal quantities, both computed as average treatment effects (ATEs) over waves <span class="math inline">\(k \geq 2\)</span> to allow at least one lag to be defined: <span class="math display">\[
+\begin{align*}
+\tau_{\text{lagged}} = \mathbb{E}[y_{ik}^{10}-y_{ik}^{00}] \\
+\tau_{\text{current}} = \mathbb{E}[y_{ik}^{11}-y_{ik}^{10}]
+\end{align*}
+\]</span> The first, <span class="math inline">\(\tau_{\text{lagged}}\)</span>, is the effect of having been treated at the <em>previous</em> wave while untreated at the current wave, relative to no treatment at either wave. The second, <span class="math inline">\(\tau_{\text{current}}\)</span>, is the <em>additional</em> effect of being treated now, given that one was already treated at the previous wave. While naive regression approaches are usually not able to separate these two quantities, ADL (autoregressive distributed lag) models and MSMs can. We thus compare different specifications of these three classes of models.</p>
+</section>
+<section id="benchmark-regressions" class="level3">
+<h3 class="anchored" data-anchor-id="benchmark-regressions">Benchmark Regressions</h3>
+<p>We have a total of 6 regression approaches. We include one naive simple regression which ignores all confounding as a benchmark, and one regression which includes <span class="math inline">\(z_{ik}\)</span> as a confounder.<br>
+Additionally, we include 4 ADL models, which can additionally include lags of the outcome, the treatment, and/or the confounder. The idea of autoregressive distributed lag models is to include <span class="math inline">\(y_{i, k-1}\)</span> as a regressor to account for stable unobserved heterogeneity, and by including <span class="math inline">\(x_{i, k-1}\)</span> as a regressor to get an estimate of a lagged treatment/participation effect. However, as we discussed above, this usually introduces post treatment bias into the estimate.<br>
+Note that, for the ADL models, the lagged treatment effect is not simply the coefficient on <span class="math inline">\(x_{i,k-1}\)</span>, because <span class="math inline">\(y_{i,k-1}\)</span> is also in the model and also depends on <span class="math inline">\(x_{i,k-1}\)</span>. To recover the total lagged effect, our ADL estimate is <span class="math display">\[ \tau_{\text{lagged}}^{\text{ADL}} = \hat\beta_{x_{k-1}} +\hat\beta_{y_{k-1}}\cdot \hat\beta_{x_k}. \]</span></p>
+<table class="caption-top table">
+<caption>Included Autoregressive Distributed Lag Models</caption>
+<colgroup>
+<col style="width: 31%">
+<col style="width: 68%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Regressors</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ADL (1)</td>
+<td><span class="math inline">\(x_{ik}, x_{i,k-1}, y_{i,k-1}\)</span></td>
+</tr>
+<tr class="even">
+<td>ADL (1) + cont. confounder</td>
+<td><span class="math inline">\(x_{ik}, x_{i,k-1}, y_{i,k-1}, z_{ik}\)</span></td>
+</tr>
+<tr class="odd">
+<td>ADL (1) + lagged confounder</td>
+<td><span class="math inline">\(x_{ik}, x_{i,k-1}, y_{i,k-1}, z_{ik}, z_{i,k-1}\)</span></td>
+</tr>
+<tr class="even">
+<td>ADL (2)</td>
+<td><span class="math inline">\(x_{ik}, x_{i,k-1}, y_{i,k-1}, y_{i,k-2}, z_{ik}, z_{i,k-1}\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="inverser-probability-of-treamtent-weights" class="level3">
+<h3 class="anchored" data-anchor-id="inverser-probability-of-treamtent-weights">Inverser-Probability-of-Treamtent Weights</h3>
+<p>The MSMs all share a GEE (generalized estimating equations) regression of <span class="math inline">\(y_{ik}\)</span> on current treatment <span class="math inline">\(x_{ik}\)</span> and lagged treatment <span class="math inline">\(x_{i,k-1}\)</span>, estimated under working independence, as the outcome model to account for autocorrelation of the panel data. They only differ in how the stabilized weights are constructed. We estimate three stabilized weight specifications, each with both raw and truncated variants (truncation at the 5th and 95th percentile). Cumulative stabilized weights are of the general form: <span class="math display">\[ \tilde w_{ik} = \prod_{s=1}^K \frac{\Pr(x_{is} \mid \bar x_{i, s-1})}{\Pr(x_{is} \mid \bar x_{i, s-1}, \bar z_{is}, y_{i, s-1})}, \]</span> where <span class="math inline">\(\bar x_{i, s-1}\)</span> and <span class="math inline">\(\bar z_{is}\)</span> denote the history of treatment and confounder up to the relevant wave. They only differ in how many lags are included into the model. Both numerator and denominator are estimated via logistic regression and the resulting probability scores are converted to observation-level weights by taking their fitted probabilities.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 32%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Weight specification</th>
+<th>Denominator model</th>
+<th>Numerator model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1-lag</strong></td>
+<td><span class="math inline">\(x_{it} \sim y_{i,t-1} + z_{it} + x_{i,t-1}\)</span></td>
+<td><span class="math inline">\(x_{it} \sim x_{i,t-1}\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>2-lag</strong></td>
+<td><span class="math inline">\(x_{it} \sim y_{i,t-1} + z_{it} + x_{i,t-1} + y_{i,t-2} + z_{i,t-1} + x_{i,t-2}\)</span></td>
+<td><span class="math inline">\(x_{it} \sim x_{i,t-1} + x_{i,t-2}\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Cumulative</strong></td>
+<td><span class="math inline">\(x_{it} \sim y_{i,t-1} + z_{it} + x_{i,t-1} + \widetilde{X}_{i,t-2}\)</span></td>
+<td><span class="math inline">\(x_{it} \sim x_{i,t-1} + \widetilde{X}_{i,t-2}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>where <span class="math inline">\(\bar X_{i, t-2}\)</span> denotes cumulative prior treatment exposure up to two waves before the current one.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>We run this simulation as a Monte-Carlo simulation with 1000 iterations for each of the four DGP scenarios</p>
+<section id="absolute-bias" class="level3">
+<h3 class="anchored" data-anchor-id="absolute-bias">Absolute Bias</h3>
+<p>For each of the twelve models, performance is summarized by the bias relative to the true ATE: <span class="math display">\[
+\begin{align*}
+\text{Bias}_{\text{current}} = \tau_{\text{current}} - \hat \tau_{\text{current}} \\
+\text{Bias}_{\text{lagged}} = \tau_{\text{lagged}} - \hat \tau_{\text{lagged}}.
+\end{align*}
+\]</span> Note that the two naive regression models do not yield a lagged effect estimate.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="root-mean-squared-error" class="level3">
+<h3 class="anchored" data-anchor-id="root-mean-squared-error">Root Mean Squared Error</h3>
+<p>In additional to absolute mean bias, we also want to measure how far estimates scatter around the true value on average, regardless of direction. We therefore also calculate the RMSE (root mean squared error):</p>
+<p><span class="math display">\[
+\begin{split}
+\mathrm{RMSE} &amp;= \sqrt{\mathrm{Bias}^2+\mathrm{Variance}} \\
+              &amp;= \sqrt{\frac{1}{B} \sum_{b=1}^B (\hat\tau_b - \tau)^2},
+\end{split}
+\]</span> where <span class="math inline">\(B\)</span> = 1000 is the number of Monte-Carlo iterations, <span class="math inline">\(\hat\tau_b\)</span> is the estimate from replication <span class="math inline">\(b\)</span>, and <span class="math inline">\(\tau\)</span> is the true effect.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="MSMPanelCond_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>Since we are specifically interested in the effect of participation in previous survey waves on current misreporting propensity, we mostly care about performance of the lagged effect estimates when there is treatment-induced time-varying confounding (figures 2 and 4).</p>
+<p>In general, we see that in terms of bias, we get less biased results for the lagged effect compared to the current treatment effects. We also see that MSMs generally outperform ADLs in scenarios with treatment-induced time-varying confounding.</p>
+<p>We see similar results in terms of RMSE. Lagged treatment effects are more accurate than current treatment effects and MSMs generally perform better in cases of treatment-induced time-varying confounders compared to ADLs. While sometimes ADL models perform quite well (e.g.&nbsp;ADL (1)), MSMs seem to be less prone to model misspecification.</p>
+<p>All in all, based on these results, I would prefer MSMs to ADL models, since model specification seems to be influencing ADL models more strongly and misspecification might become an issue. MSMs all perform reasonably well, even though they seem to struggle somewhat in cases with strong treatment-induced confounding and direct causal effects of time-varying confounders on the outcome variable.</p>
+</section>
+</section>
+</section>
+<section id="references" class="level1">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-blackwell2018make" class="csl-entry" role="listitem">
+Blackwell, M., &amp; Glynn, A. N. (2018). How to make causal inferences with time-series cross-sectional data under selection on observables. <em>American Political Science Review</em>, <em>112</em>(4), 1067–1082. <a href="https://doi.org/10.1017/S0003055418000357 ">https://doi.org/10.1017/S0003055418000357 </a>
+</div>
+<div id="ref-chesnaye2022introduction" class="csl-entry" role="listitem">
+Chesnaye, N. C., Stel, V. S., Tripepi, G., Dekker, F. W., Fu, E. L., Zoccali, C., &amp; Jager, K. J. (2022). An introduction to inverse probability of treatment weighting in observational research. <em>Clinical Kidney Journal</em>, <em>15</em>(1), 14–20. <a href="https://doi.org/10.1093/ckj/sfab158">https://doi.org/10.1093/ckj/sfab158</a>
+</div>
+<div id="ref-cole2008constructing" class="csl-entry" role="listitem">
+Cole, S. R., &amp; Hernán, M. A. (2008). Constructing inverse probability weights for marginal structural models. <em>American Journal of Epidemiology</em>, <em>168</em>(6), 656–664. <a href="https://doi.org/10.1093/aje/kwn164">https://doi.org/10.1093/aje/kwn164</a>
+</div>
+<div id="ref-robins1999association" class="csl-entry" role="listitem">
+Robins, J. M. (1999). Association, causation, and marginal structural models. <em>Synthese</em>, <em>121</em>(1/2), 151–179.
+</div>
+<div id="ref-robins2000marginal" class="csl-entry" role="listitem">
+Robins, J. M., Hernan, M. A., &amp; Brumback, B. (2000). Marginal structural models and causal inference in epidemiology. In <em>Epidemiology</em> (No. 5; Vol. 11, pp. 550–560). Lww.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
