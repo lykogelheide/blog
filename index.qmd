@@ -33,4 +33,4 @@ format:
 
 ## 2026
 
-+ Introduction to Marginal Structural Models (MSMs). Tutorial is available [here (HTML)](2026/MSM/MSMPanelCond.html) and [here (PDF)](2026/MSM/MSMPanelCond.pdf). Materials are available [here]. 
++ Introduction to Marginal Structural Models (MSMs). Tutorial is available [here (HTML)](https://lykogelheide.github.io/blog/2026/MSM/MSMPanelCond.html) and [here (PDF)](https://lykogelheide.github.io/blog/2026/MSM/MSMPanelCond.pdf). Materials are available [here](https://github.com/lykogelheide/blog/tree/main/2026/MSM). 
