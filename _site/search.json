@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "index.html#section",
-    "href": "index.html#section",
-    "title": "Luca Kogelheide",
-    "section": "",
-    "text": "Introduction to Marginal Structural Models (MSMs). Tutorial is available here (HTML) and here (PDF). Materials are available here."
-  },
-  {
     "objectID": "2026/MSM/MSMPanelCond.html",
     "href": "2026/MSM/MSMPanelCond.html",
     "title": "Tutorial: Marginal Structural Models for Panel Conditioning Research",
@@ -51,6 +44,13 @@
   {
     "objectID": "index.html",
     "href": "index.html",
+    "title": "Luca Kogelheide",
+    "section": "",
+    "text": "Introduction to Marginal Structural Models (MSMs). Tutorial is available here (HTML) and here (PDF). Materials are available here."
+  },
+  {
+    "objectID": "index.html#section",
+    "href": "index.html#section",
     "title": "Luca Kogelheide",
     "section": "",
     "text": "Introduction to Marginal Structural Models (MSMs). Tutorial is available here (HTML) and here (PDF). Materials are available here."
