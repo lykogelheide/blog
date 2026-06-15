@@ -1,0 +1,36 @@
+---
+title: Luca Kogelheide
+subtitle: Blog Posts and Tutorials
+about:
+  template: jolla
+  links:
+    - icon: building-fill
+      text: IAB
+      href: https://iab.de/en/employee/kogelheide-luca/
+    - icon: envelope-fill
+      text: E-Mail
+      href: mailto:luca.kogelheide@iab.de
+    - icon: twitter-x
+      text: Twitter
+      href: https://x.com/LYKogelheide
+    - icon: bluesky
+      text: Bluesky
+      href: https://bsky.app/profile/lykogelheide.bsky.social
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/luca-kogelheide/
+    - icon: github
+      text: Github
+      href: https://github.com/lykogelheide
+    - text: "{{< fa brands orcid >}} ORCID"
+      href: https://orcid.org/0009-0000-6724-0779
+page-layout: full
+format:
+  html: 
+    css: src/style.css
+    email-obfuscation: javascript
+---
+
+## 2026
+
++ Introduction to Marginal Structural Models (MSMs). Tutorial is available [here (HTML)](2026/MSM/MSMPanelCond.html) and [here (PDF)](2026/MSM/MSMPanelCond.pdf). Materials are available [here]. 
