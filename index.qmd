@@ -4,6 +4,9 @@ subtitle: Blog Posts and Tutorials
 about:
   template: jolla
   links:
+    - icon: house-fill
+      text: Home
+      href: https://lykogelheide.github.io/
     - icon: building-fill
       text: IAB
       href: https://iab.de/en/employee/kogelheide-luca/

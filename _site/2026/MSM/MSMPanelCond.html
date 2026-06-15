@@ -8,7 +8,7 @@
 
 <meta name="author" content="Luca Y. Kogelheide">
 
-<title>Tutorial: Marginal Structural Models for Panel Conditioning Research</title>
+<title>Tutorial: Marginal Structural Models for Panel Conditioning Research – Luca Kogelheide</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -47,17 +47,49 @@ div.csl-indent {
 }</style>
 
 
-<script src="MSMPanelCond_files/libs/clipboard/clipboard.min.js"></script>
-<script src="MSMPanelCond_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="MSMPanelCond_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="MSMPanelCond_files/libs/quarto-html/popper.min.js"></script>
-<script src="MSMPanelCond_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="MSMPanelCond_files/libs/quarto-html/anchor.min.js"></script>
-<link href="MSMPanelCond_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="MSMPanelCond_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="MSMPanelCond_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="MSMPanelCond_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="MSMPanelCond_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-158031087360bce0ff56dc785ce39e06.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -89,14 +121,57 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="quarto-light">
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="MSMPanelCond.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-marginal-structural-models" id="toc-why-marginal-structural-models" class="nav-link active" data-scroll-target="#why-marginal-structural-models">Why Marginal Structural Models?</a>
+  <ul class="collapse">
+  <li><a href="#treatment-induced-time-varying-confounding-in-panel-conditioning-research" id="toc-treatment-induced-time-varying-confounding-in-panel-conditioning-research" class="nav-link" data-scroll-target="#treatment-induced-time-varying-confounding-in-panel-conditioning-research">Treatment-Induced Time-Varying Confounding in Panel Conditioning Research</a></li>
+  </ul></li>
+  <li><a href="#introducing-marginal-structural-models" id="toc-introducing-marginal-structural-models" class="nav-link" data-scroll-target="#introducing-marginal-structural-models">Introducing Marginal Structural Models</a>
+  <ul class="collapse">
+  <li><a href="#representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs" id="toc-representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs" class="nav-link" data-scroll-target="#representing-treatment-induced-time-varying-confounding-using-directed-acyclic-graphs">Representing Treatment-Induced Time-Varying Confounding Using Directed Acyclic Graphs</a></li>
+  </ul></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation:</a>
+  <ul class="collapse">
+  <li><a href="#the-data-generating-process" id="toc-the-data-generating-process" class="nav-link" data-scroll-target="#the-data-generating-process">The Data-Generating Process</a>
+  <ul class="collapse">
+  <li><a href="#unobserved-heterogeneity" id="toc-unobserved-heterogeneity" class="nav-link" data-scroll-target="#unobserved-heterogeneity">Unobserved Heterogeneity</a></li>
+  <li><a href="#time-varying-confounder" id="toc-time-varying-confounder" class="nav-link" data-scroll-target="#time-varying-confounder">Time-Varying Confounder</a></li>
+  <li><a href="#treatment-assignment" id="toc-treatment-assignment" class="nav-link" data-scroll-target="#treatment-assignment">Treatment Assignment</a></li>
+  <li><a href="#outcome-variable" id="toc-outcome-variable" class="nav-link" data-scroll-target="#outcome-variable">Outcome Variable</a></li>
+  </ul></li>
+  <li><a href="#model-and-identification-strategies" id="toc-model-and-identification-strategies" class="nav-link" data-scroll-target="#model-and-identification-strategies">Model and Identification Strategies</a>
+  <ul class="collapse">
+  <li><a href="#estimands" id="toc-estimands" class="nav-link" data-scroll-target="#estimands">Estimands</a></li>
+  <li><a href="#benchmark-regressions" id="toc-benchmark-regressions" class="nav-link" data-scroll-target="#benchmark-regressions">Benchmark Regressions</a></li>
+  <li><a href="#inverser-probability-of-treamtent-weights" id="toc-inverser-probability-of-treamtent-weights" class="nav-link" data-scroll-target="#inverser-probability-of-treamtent-weights">Inverser-Probability-of-Treamtent Weights</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#absolute-bias" id="toc-absolute-bias" class="nav-link" data-scroll-target="#absolute-bias">Absolute Bias</a></li>
+  <li><a href="#root-mean-squared-error" id="toc-root-mean-squared-error" class="nav-link" data-scroll-target="#root-mean-squared-error">Root Mean Squared Error</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="MSMPanelCond.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+    </div>
+<!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -425,7 +500,9 @@ Note that, for the ADL models, the lagged treatment effect is not simply the coe
 </section>
 </section>
 </section>
-<section id="references" class="level1 unnumbered">
+<section id="references" class="level1">
+
+
 
 
 </section>
@@ -446,8 +523,7 @@ Robins, J. M. (1999). Association, causation, and marginal structural models. <e
 <div id="ref-robins2000marginal" class="csl-entry" role="listitem">
 Robins, J. M., Hernan, M. A., &amp; Brumback, B. (2000). Marginal structural models and causal inference in epidemiology. In <em>Epidemiology</em> (No. 5; Vol. 11, pp. 550–560). Lww.
 </div>
-</div></section></div></main>
-<!-- /main column -->
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
